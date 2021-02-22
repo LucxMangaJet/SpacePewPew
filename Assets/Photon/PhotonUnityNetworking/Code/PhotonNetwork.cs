@@ -2362,7 +2362,6 @@ namespace Photon.Pun
             }
         }
 
-
         public static GameObject Instantiate(string prefabName, Vector3 position, Quaternion rotation, byte group = 0, object[] data = null)
         {
             if (CurrentRoom == null)

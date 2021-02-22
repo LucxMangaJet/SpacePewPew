@@ -9,11 +9,20 @@ public class ConnectionTestViewController : MonoBehaviour
 {
     [SerializeField] ConnectionModel connectionModel;
 
-    private string nickname = "NewPlayer";
-    private string lastError;
+    private string nickname = "";
+    private PlayerRole currentRole = PlayerRole.Spectator;
+    private TeamSelectEnum currentTeam = TeamSelectEnum.None;
+
+    public enum TeamSelectEnum
+    {
+        None = -1,
+        Red = 0,
+        Blue = 1
+    }
 
     private void Start()
     {
+        nickname = PlayerPrefs.GetString("Nickname", "New Player");
         connectionModel.ConnectionError += OnError;
     }
 
@@ -25,7 +34,7 @@ public class ConnectionTestViewController : MonoBehaviour
 
     private void OnError(string obj)
     {
-        lastError = obj;
+        //lastError = obj;
     }
 
     private void OnGUI()
@@ -34,6 +43,7 @@ public class ConnectionTestViewController : MonoBehaviour
         GUI.skin.label.fontSize = 40;
         GUI.skin.button.fontSize = 40;
         GUI.skin.textField.fontSize = 40;
+
         GUILayout.Label("State: " + PhotonNetwork.NetworkClientState);
 
         switch (PhotonNetwork.NetworkClientState)
@@ -90,14 +100,47 @@ public class ConnectionTestViewController : MonoBehaviour
                 GUILayout.Label("-----");
                 foreach (var pair in room.Players)
                 {
-                    GUILayout.Label(pair.Key + ": " + pair.Value.NickName + (pair.Value.IsMasterClient ? "(MasterClient)" : ""));
+                    string desc = pair.Key + ": " + pair.Value.NickName + (pair.Value.IsMasterClient ? " (M)" : "");
+                    string additional = " " + (TeamSelectEnum) pair.Value.GetTeam() + " " + pair.Value.GetRole();
+                    GUILayout.Label(desc + additional);
                 }
+                
                 GUILayout.Label("-----");
+                GUILayout.Label("Settings:");
 
-                GUILayout.Label("LocalPlayer:");
+                GUILayout.BeginHorizontal();
                 GUILayout.Label("Name:");
-                nickname = GUILayout.TextField(nickname);
-                connectionModel.RenameLocalPlayerTo(nickname);
+                var newNickname = GUILayout.TextField(nickname);
+                if (newNickname != nickname)
+                {
+                    nickname = newNickname;
+                    connectionModel.RenameLocalPlayerTo(nickname);
+                }
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Team:");
+                if (GUILayout.Button("Red"))
+                {
+                    connectionModel.ChangeLocalPlayerTeamTo((int)TeamSelectEnum.Red);
+                }
+                if (GUILayout.Button("Blue"))
+                {
+                    connectionModel.ChangeLocalPlayerTeamTo((int)TeamSelectEnum.Blue);
+                }
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Role:");
+                if (GUILayout.Button("Pilot"))
+                {
+                    connectionModel.ChangeLocalPlayerRoleTo(PlayerRole.Pilot);
+                }
+                if (GUILayout.Button("Gunner"))
+                {
+                    connectionModel.ChangeLocalPlayerRoleTo(PlayerRole.Gunner);
+                }
+                GUILayout.EndHorizontal();
 
                 if (PhotonNetwork.IsMasterClient)
                 {
@@ -105,13 +148,19 @@ public class ConnectionTestViewController : MonoBehaviour
                     {
                         connectionModel.StartGame();
                     }
+                    if (connectionModel.IsRoomWellDistributed(out string failReason))
+                    {
+                        GUI.color = Color.green;
+                        GUILayout.Label("READY!");
+                    }
+                    else 
+                    {
+                        GUI.color = Color.yellow;
+                        GUILayout.Label("WARN: " + failReason);
+                    }
                 }
-                
                 break;
         }
-
-        GUI.color = Color.red;
-        GUILayout.Label("LastError: " + lastError);
     }
 
 }
