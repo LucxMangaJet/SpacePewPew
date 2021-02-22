@@ -11,14 +11,9 @@ public class ConnectionTestViewController : MonoBehaviour
 
     private string nickname = "";
     private PlayerRole currentRole = PlayerRole.Spectator;
-    private TeamSelectEnum currentTeam = TeamSelectEnum.None;
+    private Team currentTeam = Team.None;
 
-    public enum TeamSelectEnum
-    {
-        None = -1,
-        Red = 0,
-        Blue = 1
-    }
+
 
     private void Start()
     {
@@ -101,7 +96,7 @@ public class ConnectionTestViewController : MonoBehaviour
                 foreach (var pair in room.Players)
                 {
                     string desc = pair.Key + ": " + pair.Value.NickName + (pair.Value.IsMasterClient ? " (M)" : "");
-                    string additional = " " + (TeamSelectEnum) pair.Value.GetTeam() + " " + pair.Value.GetRole();
+                    string additional = " " + (Team) pair.Value.GetTeam() + " " + pair.Value.GetRole();
                     GUILayout.Label(desc + additional);
                 }
                 
@@ -122,11 +117,11 @@ public class ConnectionTestViewController : MonoBehaviour
                 GUILayout.Label("Team:");
                 if (GUILayout.Button("Red"))
                 {
-                    connectionModel.ChangeLocalPlayerTeamTo((int)TeamSelectEnum.Red);
+                    connectionModel.ChangeLocalPlayerTeamTo(Team.Red);
                 }
                 if (GUILayout.Button("Blue"))
                 {
-                    connectionModel.ChangeLocalPlayerTeamTo((int)TeamSelectEnum.Blue);
+                    connectionModel.ChangeLocalPlayerTeamTo(Team.Blue);
                 }
                 GUILayout.EndHorizontal();
 

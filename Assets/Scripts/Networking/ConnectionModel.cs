@@ -47,7 +47,7 @@ public class ConnectionModel : MonoBehaviourPunCallbacks
         PhotonNetwork.LocalPlayer.SetRole(newRole);
     }
 
-    public void ChangeLocalPlayerTeamTo(int newTeam)
+    public void ChangeLocalPlayerTeamTo(Team newTeam)
     {
         PhotonNetwork.LocalPlayer.SetTeam(newTeam);
     }
@@ -98,7 +98,7 @@ public class ConnectionModel : MonoBehaviourPunCallbacks
 
     public bool IsRoomWellDistributed(out string failReason)
     {
-        Dictionary<(int, PlayerRole), int> distributionDict = new Dictionary<(int, PlayerRole), int>();
+        Dictionary<(Team, PlayerRole), int> distributionDict = new Dictionary<(Team, PlayerRole), int>();
 
         foreach (var player in PhotonNetwork.CurrentRoom.Players.Values)
         {
@@ -110,7 +110,7 @@ public class ConnectionModel : MonoBehaviourPunCallbacks
                 distributionDict[pair] = 1;
         }
 
-        (int, PlayerRole)[] checks = {(0, PlayerRole.Pilot), (0, PlayerRole.Gunner), (1, PlayerRole.Pilot), (1, PlayerRole.Gunner)};
+        (Team, PlayerRole)[] checks = {(Team.Red, PlayerRole.Pilot), (Team.Red, PlayerRole.Gunner), (Team.Blue, PlayerRole.Pilot), (Team.Blue, PlayerRole.Gunner)};
 
         foreach (var check in checks)
         {
@@ -141,19 +141,39 @@ public enum PlayerRole
     Gunner
 }
 
-public static class PhotonExtensions
+public enum Team
 {
-    public static int GetTeam(this Player p)
+    None = -1,
+    Red = 0,
+    Blue = 1
+}
+
+public static class Extensions
+{
+    public static Color ToColor(this Team team)
+    {
+        switch (team)
+        {
+            case Team.Red:
+                return Color.red;
+            case Team.Blue:
+                return Color.blue;
+            default:
+                return Color.white;
+        }
+    }
+
+    public static Team GetTeam(this Player p)
     {
         var o = p.CustomProperties["Team"];
 
         if (o == null)
-            return -1;
+            return Team.None;
 
-        return (int)o;
+        return (Team)o;
     }
 
-    public static bool SetTeam(this Player p, int teamId)
+    public static bool SetTeam(this Player p, Team teamId)
     {
         if (p.IsLocal)
         {
