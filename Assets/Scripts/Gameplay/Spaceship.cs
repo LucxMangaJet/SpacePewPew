@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
+using UnityEngine.InputSystem;
 
 //Maybe write own client side prediction: https://www.kinematicsoup.com/news/2017/5/30/multiplayerprediction
 
@@ -25,10 +26,11 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     [SerializeField] SpriteRenderer teamColorsRenderer;
     [SerializeField] Transform cockpitCamTarget, weapon1CamTarget;
     [SerializeField] new Rigidbody2D rigidbody;
-    [SerializeField] new Light2D light;
+    [SerializeField] new Light2D light, directionalLight;
     [SerializeField] ParticleSystem enginePS;
     [SerializeField] Transform engineTransform;
     [SerializeField] Gun[] pilotGuns;
+    
 
     [SerializeField] ParticleSystem rcsLeftFront, rcsLeftBack, rcsRightFront, rcsRightBack, rcsFront;
 
@@ -38,6 +40,8 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     private float verticalCache;
     private float horizontalCache;
     private float rotationCompensation;
+
+    private Vector3 directionalLightOffset;
 
     public System.Action<Spaceship> HealthChanged;
 
@@ -54,10 +58,15 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         health = maxHealth;
     }
 
+    protected override void Start()
+    {
+        base.Start();
+        directionalLightOffset = directionalLight.transform.localPosition;
+    }
+
     private void Update()
     {
-        //I should be commanding
-        if (owningTeam == GetLocalTeam() && GetLocalPlayerRole() == PlayerRole.Pilot)
+        if (AmOwningPilot())
         {
             if (photonView.IsMine)
             {
@@ -74,8 +83,15 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         UpdateEffects();
     }
 
+    private bool AmOwningPilot()
+    {
+        return owningTeam == GetLocalTeam() && GetLocalPlayerRole() == PlayerRole.Pilot;
+    }
+
     private void UpdateEffects()
     {
+        directionalLight.transform.position = transform.position + directionalLightOffset;
+
         var emission = enginePS.emission;
         emission.rateOverTimeMultiplier = Mathf.Lerp(10, 2000, Mathf.Abs(Mathf.Max(0, verticalCache)));
 
@@ -88,9 +104,6 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 
     private void PilotUpdate()
     {
-        verticalCache = Input.GetAxisRaw("Vertical");
-        horizontalCache = Input.GetAxisRaw("Horizontal");
-
         //Spaceship sprite is upsidedown, thats why there are "-"
         rigidbody.AddTorque(rotationForce * -horizontalCache * Time.deltaTime);
         rigidbody.AddForce(transform.up * Mathf.Min(-0.05f, -verticalCache) * engineForce * Time.deltaTime);
@@ -108,21 +121,6 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 
         rigidbody.AddTorque(rotationCompensation * rotationCompensationMultiplyer * Time.deltaTime);
         rigidbody.angularVelocity = Mathf.Clamp(rigidbody.angularVelocity, -maxRotationSpeed, maxRotationSpeed);
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            foreach (var gun in pilotGuns)
-            {
-                gun.StartFiring(Rigidbody, Team);
-            }
-        }
-        else if (Input.GetMouseButtonUp(0))
-        {
-            foreach (var gun in pilotGuns)
-            {
-                gun.StopFiring();
-            }
-        }
     }
 
     public void Server_SetTeam(Team team)
@@ -146,6 +144,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         ServiceLocator.SetLocation(team, Location.Weapon1, weapon1CamTarget);
 
         light.gameObject.SetActive(team == GetLocalTeam());
+        directionalLight.gameObject.SetActive(team == GetLocalTeam());
     }
 
     private void Server_SetHealth(float newHealth)
@@ -188,6 +187,37 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
             horizontalCache = (float)stream.ReceiveNext();
             verticalCache = (float)stream.ReceiveNext();
             rotationCompensation = (float)stream.ReceiveNext();
+        }
+    }
+
+    public void OnMoveInput(InputAction.CallbackContext context)
+    {
+        if (AmOwningPilot())
+        {
+            var value = context.ReadValue<Vector2>();
+            verticalCache = value.y;
+            horizontalCache = value.x;
+        }
+    }
+
+    public void OnFire(InputAction.CallbackContext context)
+    {
+        if (AmOwningPilot())
+        {
+            if (context.started)
+            {
+                foreach (var gun in pilotGuns)
+                {
+                    gun.StartFiring(Rigidbody, Team);
+                }
+            }
+            else if (context.canceled)
+            {
+                foreach (var gun in pilotGuns)
+                {
+                    gun.StopFiring();
+                }
+            }
         }
     }
 }
