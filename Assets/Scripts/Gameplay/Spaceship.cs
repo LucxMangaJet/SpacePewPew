@@ -47,7 +47,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     private Vector3 directionalLightOffset;
     private Quaternion directionalLightRotation;
 
-    private bool complexControlScheme = false;
+    [SerializeField] bool complexControlScheme = false;
 
     public System.Action<Spaceship> HealthChanged;
 
@@ -145,6 +145,9 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 
             emission = rcsRightFront.emission;
             emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, rightStrength)));
+
+            if (rigidbody.velocity.magnitude > 0.5f)
+                transform.up = -rigidbody.velocity;
         }
     }
 
@@ -185,17 +188,21 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 
     private void SimpleControlSchemeUpdate()
     {
-        Vector2 target = new Vector2(horizontalCache, verticalCache).normalized * maxSpeed;
+        Vector2 target = new Vector2(horizontalCache, verticalCache);
+        if (target.magnitude > 1)
+            target.Normalize();
+
+
         Vector2 velocity = rigidbody.velocity;
 
-        Vector2 forceDir = (target - velocity).normalized;
+        Vector2 forceDir = ((target*maxSpeed) - velocity);
 
         movementForce = forceDir;
 
-        rigidbody.AddForce(forceDir * engineForce * Time.deltaTime);
+        rigidbody.AddForce(forceDir.normalized * target.magnitude * engineForce * Time.deltaTime);
 
-        if (velocity.magnitude > 0.5f)
-            transform.up = -rigidbody.velocity;
+        rigidbody.velocity = Vector3.ClampMagnitude(rigidbody.velocity, maxSpeed);
+
     }
 
     public void Server_SetTeam(Team team)
