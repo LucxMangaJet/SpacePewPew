@@ -3,22 +3,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GunnerPosition : MonobehaviourPunPew
 {
     [SerializeField] Spaceship spaceship;
     [SerializeField] Gun gun;
-    Camera camera;
 
-    protected override void Start()
-    {
-        camera = Camera.main;
-    }
+    Vector2 pointDirection;
 
     private void Update()
     {
         //I should be commanding
-        if (spaceship.Team == GetLocalTeam() && GetLocalPlayerRole() == PlayerRole.Gunner)
+        if (AmOwningGunner())
         {
             if (photonView.IsMine)
             {
@@ -33,18 +30,46 @@ public class GunnerPosition : MonobehaviourPunPew
         }
     }
 
+    private bool AmOwningGunner()
+    {
+        return spaceship.Team == GetLocalTeam() && GetLocalPlayerRole() == PlayerRole.Gunner;
+    }
+
     private void GunnerUpdate()
     {
-        Vector2 mousePos = Input.mousePosition - new Vector3(Screen.width/2, Screen.height/2);
-        transform.up = -mousePos.normalized;
+        transform.up = -pointDirection;
+    }
 
-        if (Input.GetMouseButtonDown(0))
+    public void OnFire(InputAction.CallbackContext context)
+    {
+        if (AmOwningGunner())
         {
-            gun.StartFiring(spaceship.Rigidbody, spaceship.Team);
+            if (context.started)
+            {
+                gun.StartFiring(spaceship.Rigidbody, spaceship.Team);
+            }
+            else if (context.canceled)
+            {
+                gun.StopFiring();
+            }
         }
-        else if (Input.GetMouseButtonUp(0))
+    }
+
+    public void OnLook(InputAction.CallbackContext context)
+    {
+        if (AmOwningGunner())
         {
-            gun.StopFiring();
+            var value = context.ReadValue<Vector2>();
+            pointDirection = value;
+        }
+    }
+
+    public void OnMousePosition(InputAction.CallbackContext context)
+    {
+        if (AmOwningGunner())
+        {
+            var value = context.ReadValue<Vector2>();
+            pointDirection = (value - new Vector2(Screen.width / 2, Screen.height / 2)).normalized;
         }
     }
 }
