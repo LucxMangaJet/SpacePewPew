@@ -10,10 +10,10 @@ using UnityEngine.Experimental.Rendering.Universal;
 
 public class Spaceship : MonobehaviourPunPew
 {
-    [SerializeField] float engineForce, rotationForce, lightDistance;
+    [SerializeField] float engineForce, rotationForce;
 
     [SerializeField] SpriteRenderer teamColorsRenderer;
-    [SerializeField] Transform cockpitCamTarget, weapon1CamTarget, lightSource;
+    [SerializeField] Transform cockpitCamTarget, weapon1CamTarget;
     [SerializeField] new Rigidbody2D rigidbody;
     [SerializeField] new Light2D light;
 
@@ -38,8 +38,6 @@ public class Spaceship : MonobehaviourPunPew
                 photonView.RequestOwnership();
             }
         }
-
-        lightSource.transform.position = transform.position + (Vector3.right + Vector3.up) * lightDistance;
     }
 
     private void PilotUpdate()
