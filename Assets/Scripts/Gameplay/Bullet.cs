@@ -18,8 +18,15 @@ public class Bullet : MonobehaviourPunPew, IPunInstantiateMagicCallback
     {
         if (photonView.IsMine)
         {
-            Destroy(gameObject, lifetime);
+            StartCoroutine(DelayedDestroy(10));
         }
+    }
+
+    private IEnumerator DelayedDestroy(float t)
+    {
+        yield return new WaitForSeconds(t);
+        if (photonView.IsMine || PhotonNetwork.IsMasterClient)
+            PhotonNetwork.Destroy(gameObject);
     }
 
     public void OnPhotonInstantiate(PhotonMessageInfo info)
@@ -36,7 +43,7 @@ public class Bullet : MonobehaviourPunPew, IPunInstantiateMagicCallback
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            if(collision.TryGetComponent(out IDamagable damagable))
+            if (collision.TryGetComponent(out IDamagable damagable))
             {
                 damagable.TakeDamage(this, damage);
             }
