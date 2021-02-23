@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerCamera : MonoBehaviour
+public class PlayerCamera : MonobehaviourPunPew
 {
     [SerializeField] Vector3 offset;
+    [SerializeField] Behaviour[] toDisableOnOthers;
 
     Location viewTarget;
     Team team;
@@ -14,6 +15,13 @@ public class PlayerCamera : MonoBehaviour
     private void Start()
     {
         UpdateTargetsBasedOnRole();
+
+        if (!photonView.IsMine)
+        {
+            foreach (var c in toDisableOnOthers)
+                c.enabled = false;
+        }
+        
     }
 
     private void UpdateTargetsBasedOnRole()

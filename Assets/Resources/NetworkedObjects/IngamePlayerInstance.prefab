@@ -48,6 +48,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   offset: {x: 0, y: 0, z: -10}
+  toDisableOnOthers:
+  - {fileID: 4763571890026585429}
+  - {fileID: 4763571890026585428}
 --- !u!114 &8505179255822434963
 MonoBehaviour:
   m_ObjectHideFlags: 0
