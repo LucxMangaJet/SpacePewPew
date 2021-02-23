@@ -55,6 +55,7 @@ MonoBehaviour:
   damage: 5
   rigidbody2D: {fileID: 464339766847847242}
   spriteRenderer: {fileID: 464339766847847241}
+  light: {fileID: 9165219500120012928}
 --- !u!212 &464339766847847241
 SpriteRenderer:
   m_ObjectHideFlags: 0
