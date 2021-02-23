@@ -29,6 +29,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     [SerializeField] new Light2D light, directionalLight;
     [SerializeField] ParticleSystem enginePS;
     [SerializeField] Transform engineTransform;
+    [SerializeField] PlayerInput playerInput;
     [SerializeField] Gun[] pilotGuns;
 
 
@@ -65,6 +66,8 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 
     protected override void Start()
     {
+        playerInput.SwitchCurrentControlScheme(Gamepad.current);
+
         base.Start();
         directionalLightOffset = directionalLight.transform.localPosition;
         directionalLightRotation = directionalLight.transform.rotation;

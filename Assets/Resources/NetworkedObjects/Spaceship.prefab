@@ -19491,6 +19491,7 @@ GameObject:
   - component: {fileID: 6926503782011930028}
   - component: {fileID: 856777656}
   - component: {fileID: 3267322747878637505}
+  - component: {fileID: 1209540388583065848}
   m_Layer: 0
   m_Name: Spaceship
   m_TagString: Untagged
@@ -19548,6 +19549,7 @@ MonoBehaviour:
   directionalLight: {fileID: 2810164325445007815}
   enginePS: {fileID: 6299550351943362529}
   engineTransform: {fileID: 7163452392800116896}
+  playerInput: {fileID: 3267322747878637505}
   pilotGuns:
   - {fileID: 3532146867853208867}
   - {fileID: 8667734055988066958}
@@ -19628,6 +19630,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 6926503782011930027}
   - {fileID: 6926503782011930028}
+  - {fileID: 1209540388583065848}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -19842,10 +19845,26 @@ MonoBehaviour:
     m_ActionId: 02bf8e60-f9c8-4a76-8aa7-a771f14335f3
     m_ActionName: Player/Pan[/Keyboard/q,/Keyboard/e]
   m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: Gamepad
+  m_DefaultControlScheme: 
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &1209540388583065848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6926503782011930018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 0
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1
 --- !u!1 &6926503782296021031
 GameObject:
   m_ObjectHideFlags: 0
