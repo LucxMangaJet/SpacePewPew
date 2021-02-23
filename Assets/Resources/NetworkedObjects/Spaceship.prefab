@@ -19534,6 +19534,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   engineForce: 1000
   rotationForce: 400
+  breakForce: 500
+  panForce: 500
   maxHealth: 100
   rotationCompensationMultiplyer: 3
   maxSpeed: 25
@@ -19823,6 +19825,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 3700a2be-f472-4823-9469-868ba7575727
     m_ActionName: Player/MousePosition[/Mouse/position]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6926503782011930027}
+        m_TargetAssemblyTypeName: Spaceship, Assembly-CSharp
+        m_MethodName: OnPanInput
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 02bf8e60-f9c8-4a76-8aa7-a771f14335f3
+    m_ActionName: Player/Pan[/Keyboard/q,/Keyboard/e]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player

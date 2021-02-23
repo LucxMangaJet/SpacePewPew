@@ -17,7 +17,7 @@ public interface IDamagable
 
 public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 {
-    [SerializeField] float engineForce, rotationForce;
+    [SerializeField] float engineForce, rotationForce, breakForce, panForce;
     [SerializeField] float maxHealth;
     [SerializeField] float rotationCompensationMultiplyer;
     [SerializeField] float maxSpeed, maxRotationSpeed;
@@ -39,6 +39,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 
     private float verticalCache;
     private float horizontalCache;
+    private float panCache;
     private float rotationCompensation;
 
     private Vector3 directionalLightOffset;
@@ -92,29 +93,51 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     {
         directionalLight.transform.position = transform.position + directionalLightOffset;
 
+        //engines breaks
         var emission = enginePS.emission;
-        emission.rateOverTimeMultiplier = Mathf.Lerp(10, 2000, Mathf.Abs(Mathf.Max(0, verticalCache)));
+        emission.rateOverTimeMultiplier = Mathf.Lerp(10, 2000, Mathf.Max(0, verticalCache));
 
+        emission = rcsFront.emission;
+        emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, -verticalCache)));
+
+        //front 
         emission = rcsLeftFront.emission;
-        emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(horizontalCache, -rotationCompensation / 20)));
+        emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(horizontalCache, -rotationCompensation / 20, panCache)));
 
         emission = rcsRightFront.emission;
-        emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(-horizontalCache, rotationCompensation / 20)));
+        emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(-horizontalCache, rotationCompensation / 20, -panCache)));
+
+        //back
+        emission = rcsLeftBack.emission;
+        emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, panCache)));
+
+        emission = rcsRightBack.emission;
+        emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, -panCache)));
+
     }
 
     private void PilotUpdate()
     {
-        //Spaceship sprite is upsidedown, thats why there are "-"
-        rigidbody.AddTorque(rotationForce * -horizontalCache * Time.deltaTime);
-        rigidbody.AddForce(transform.up * Mathf.Min(-0.05f, -verticalCache) * engineForce * Time.deltaTime);
+        //accell + breaks RCS
+        if (verticalCache >= 0)
+            rigidbody.AddForce(transform.up * Mathf.Min(-0.05f, -verticalCache) * engineForce * Time.deltaTime);
+        else
+            rigidbody.AddForce(transform.up * -verticalCache * breakForce * Time.deltaTime);
+
         rigidbody.velocity = Vector3.ClampMagnitude(rigidbody.velocity, maxSpeed);
 
+        //panning RCS
+        rigidbody.AddForce(transform.right * -panCache * panForce * Time.deltaTime);
+
+        //roation compensation RCS
         if (Mathf.Abs(horizontalCache) < 0.1f)
             rotationCompensation = -rigidbody.angularVelocity;
         else
             rotationCompensation = 0;
-
         rigidbody.AddTorque(rotationCompensation * rotationCompensationMultiplyer * Time.deltaTime);
+
+        //rotation
+        rigidbody.AddTorque(rotationForce * -horizontalCache * Time.deltaTime);
         rigidbody.angularVelocity = Mathf.Clamp(rigidbody.angularVelocity, -maxRotationSpeed, maxRotationSpeed);
     }
 
@@ -176,12 +199,14 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
             stream.SendNext(horizontalCache);
             stream.SendNext(verticalCache);
             stream.SendNext(rotationCompensation);
+            stream.SendNext(panCache);
         }
         else
         {
             horizontalCache = (float)stream.ReceiveNext();
             verticalCache = (float)stream.ReceiveNext();
             rotationCompensation = (float)stream.ReceiveNext();
+            panCache = (float)stream.ReceiveNext();
         }
     }
 
@@ -192,6 +217,15 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
             var value = context.ReadValue<Vector2>();
             verticalCache = value.y;
             horizontalCache = value.x;
+        }
+    }
+
+    public void OnPanInput(InputAction.CallbackContext context)
+    {
+        if (AmOwningPilot())
+        {
+            var value = context.ReadValue<float>();
+            panCache = value;
         }
     }
 
