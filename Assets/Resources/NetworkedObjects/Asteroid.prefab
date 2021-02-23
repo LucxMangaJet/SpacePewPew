@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 385b19a0a80613046bab20c6f3859c75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startRotationMinMax: {x: 0, y: 100}
+  startRotationMinMax: {x: 0, y: 5}
   rigidbody: {fileID: 2190737203606466351}
 --- !u!114 &2190737203606466349
 MonoBehaviour:
@@ -155,7 +155,7 @@ MonoBehaviour:
   - {x: -5.1207743, y: -0.1788933, z: 0}
   m_ShapePathHash: 1335243500
   m_Mesh: {fileID: 0}
-  m_InstanceId: -13214
+  m_InstanceId: 65234
 --- !u!58 &2190737203606466350
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -19,6 +19,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     [SerializeField] float engineForce, rotationForce;
     [SerializeField] float maxHealth;
     [SerializeField] float rotationCompensationMultiplyer;
+    [SerializeField] float maxSpeed, maxRotationSpeed;
 
     [Header("Components")]
     [SerializeField] SpriteRenderer teamColorsRenderer;
@@ -29,7 +30,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     [SerializeField] Transform engineTransform;
     [SerializeField] Gun[] pilotGuns;
 
-    [SerializeField] ParticleSystem rcsLeft, rcsRight;
+    [SerializeField] ParticleSystem rcsLeftFront, rcsLeftBack, rcsRightFront, rcsRightBack, rcsFront;
 
     private Team owningTeam;
     private float health;
@@ -78,21 +79,22 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         var emission = enginePS.emission;
         emission.rateOverTimeMultiplier = Mathf.Lerp(10, 2000, Mathf.Abs(Mathf.Max(0, verticalCache)));
 
-        emission = rcsLeft.emission;
+        emission = rcsLeftFront.emission;
         emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(horizontalCache, -rotationCompensation / 20)));
 
-        emission = rcsRight.emission;
+        emission = rcsRightFront.emission;
         emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(-horizontalCache, rotationCompensation / 20)));
     }
 
     private void PilotUpdate()
     {
-        verticalCache = Input.GetAxis("Vertical");
-        horizontalCache = Input.GetAxis("Horizontal");
+        verticalCache = Input.GetAxisRaw("Vertical");
+        horizontalCache = Input.GetAxisRaw("Horizontal");
 
         //Spaceship sprite is upsidedown, thats why there are "-"
         rigidbody.AddTorque(rotationForce * -horizontalCache * Time.deltaTime);
         rigidbody.AddForce(transform.up * Mathf.Min(-0.05f, -verticalCache) * engineForce * Time.deltaTime);
+        rigidbody.velocity = Vector3.ClampMagnitude(rigidbody.velocity, maxSpeed);
 
         if (Mathf.Abs(horizontalCache) < 0.1f)
         {
@@ -105,6 +107,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         }
 
         rigidbody.AddTorque(rotationCompensation * rotationCompensationMultiplyer * Time.deltaTime);
+        rigidbody.angularVelocity = Mathf.Clamp(rigidbody.angularVelocity, -maxRotationSpeed, maxRotationSpeed);
 
         if (Input.GetMouseButtonDown(0))
         {
