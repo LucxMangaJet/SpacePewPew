@@ -353,7 +353,7 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!43 &359868848
+--- !u!43 &336143448
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -583,6 +583,14 @@ PrefabInstance:
     - target: {fileID: 2190737203606466349, guid: 237caa9205d6ec44c98c840fe392093e, type: 3}
       propertyPath: viewIdField
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190737203606466351, guid: 237caa9205d6ec44c98c840fe392093e, type: 3}
+      propertyPath: m_Mass
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190737203606466351, guid: 237caa9205d6ec44c98c840fe392093e, type: 3}
+      propertyPath: m_UseAutoMass
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 237caa9205d6ec44c98c840fe392093e, type: 3}
@@ -865,7 +873,7 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!43 &1318670971
+--- !u!43 &987765713
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1061,7 +1069,7 @@ MonoBehaviour:
   playerCamPrefab: {fileID: 4763571890026585419, guid: c1cdb1c315a67b04f9293848f89b84dc, type: 3}
   spaceshipPrefab: {fileID: 6926503782011930018, guid: 1ea7bacfb69e6a540a11af88b31a059b, type: 3}
   localTeam: 0
-  localRole: 2
+  localRole: 1
 --- !u!4 &1715478739
 Transform:
   m_ObjectHideFlags: 0
@@ -1138,6 +1146,14 @@ PrefabInstance:
     - target: {fileID: 2190737203606466349, guid: 237caa9205d6ec44c98c840fe392093e, type: 3}
       propertyPath: viewIdField
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190737203606466351, guid: 237caa9205d6ec44c98c840fe392093e, type: 3}
+      propertyPath: m_Mass
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190737203606466351, guid: 237caa9205d6ec44c98c840fe392093e, type: 3}
+      propertyPath: m_UseAutoMass
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 237caa9205d6ec44c98c840fe392093e, type: 3}
