@@ -9,6 +9,10 @@ using UnityEngine.Experimental.Rendering.Universal;
 using UnityEngine.InputSystem;
 
 //Maybe write own client side prediction: https://www.kinematicsoup.com/news/2017/5/30/multiplayerprediction
+// add slowdown sideways force
+// give panning thrusters different colors/speeds
+// add more manouvrability control on move (moving less should move slower etc)
+// add faster slowdown than speedup
 
 public interface IDamagable
 {
