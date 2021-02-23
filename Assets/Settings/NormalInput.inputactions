@@ -44,6 +44,14 @@
                     "expectedControlType": "Axis",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "Acceleration",
+                    "type": "Value",
+                    "id": "28b2bb14-1a76-4bbc-a501-c178961fa3a6",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -193,7 +201,7 @@
                 {
                     "name": "",
                     "id": "143bb1cd-cc10-4eca-a2f0-a3664166fe91",
-                    "path": "<Gamepad>/rightTrigger",
+                    "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
@@ -299,6 +307,17 @@
                     "action": "Pan",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "864054ab-5381-41d0-b3dc-9564410db55e",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Acceleration",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },

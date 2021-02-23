@@ -17,7 +17,7 @@ public interface IDamagable
 
 public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 {
-    [SerializeField] float engineForce, rotationForce, breakForce, panForce;
+    [SerializeField] float engineForce, rotationMultiplyer, breakForce, panForce;
     [SerializeField] float maxHealth;
     [SerializeField] float rotationCompensationMultiplyer;
     [SerializeField] float maxSpeed, maxRotationSpeed;
@@ -41,9 +41,10 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     private float verticalCache;
     private float horizontalCache;
     private float panCache;
-    private float rotationCompensation;
+    private float acceleration;
+    private float rotationForce;
 
-    private Vector2 movementForce;
+    private Vector2 movementTarget;
     private Vector3 directionalLightOffset;
     private Quaternion directionalLightRotation;
 
@@ -102,107 +103,55 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         directionalLight.transform.position = transform.position + directionalLightOffset;
         directionalLight.transform.rotation = directionalLightRotation;
 
-        if (complexControlScheme)
-        {
-            //engines breaks
-            var emission = enginePS.emission;
-            emission.rateOverTimeMultiplier = Mathf.Lerp(10, 2000, Mathf.Max(0, verticalCache));
 
-            emission = rcsFront.emission;
-            emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, -verticalCache)));
+        //engines breaks
+        var emission = enginePS.emission;
+        emission.rateOverTimeMultiplier = Mathf.Lerp(10, 2000, Mathf.Max(0, acceleration));
 
-            //front 
-            emission = rcsLeftFront.emission;
-            emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(horizontalCache, -rotationCompensation / 20, panCache)));
+        //emission = rcsFront.emission;
+        //emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, topStrength)));
 
-            emission = rcsRightFront.emission;
-            emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(-horizontalCache, rotationCompensation / 20, -panCache)));
+        //front 
+        emission = rcsLeftFront.emission;
+        emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, -rotationForce * 0.1f, panCache)));
 
-            //back
-            emission = rcsLeftBack.emission;
-            emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, panCache)));
+        emission = rcsRightFront.emission;
+        emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, rotationForce * 0.1f, -panCache)));
 
-            emission = rcsRightBack.emission;
-            emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, -panCache)));
-        }
-        else
-        {
-            float engineStrength = Vector3.Dot(-transform.up, movementForce);
-            float leftStrength = Vector3.Dot(-transform.right, movementForce);
-            float rightStrength = Vector3.Dot(transform.right, movementForce);
-            float topStrength = Vector3.Dot(transform.up, movementForce);
+        //back
+        emission = rcsLeftBack.emission;
+        emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, panCache)));
 
-            //engines breaks
-            var emission = enginePS.emission;
-            emission.rateOverTimeMultiplier = Mathf.Lerp(10, 2000, Mathf.Max(0, engineStrength));
+        emission = rcsRightBack.emission;
+        emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, -panCache)));
 
-            emission = rcsFront.emission;
-            emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, topStrength)));
-
-            //front 
-            emission = rcsLeftFront.emission;
-            emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, leftStrength)));
-
-            emission = rcsRightFront.emission;
-            emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, rightStrength)));
-
-            if (rigidbody.velocity.magnitude > 0.5f)
-                transform.up = -rigidbody.velocity;
-        }
     }
 
     private void PilotUpdate()
     {
-        if (complexControlScheme)
-            ComplexControlSchemeUpdate();
-        else
-            SimpleControlSchemeUpdate();
+        SimpleControlSchemeUpdate();
     }
 
-    private void ComplexControlSchemeUpdate()
+    private void SimpleControlSchemeUpdate()
     {
-        //accell + breaks RCS
-        if (verticalCache >= 0)
-            rigidbody.AddForce(transform.up * Mathf.Min(-0.05f, -verticalCache) * engineForce * Time.deltaTime);
-        else
-            rigidbody.AddForce(transform.up * -verticalCache * breakForce * Time.deltaTime);
+        movementTarget = new Vector2(horizontalCache, verticalCache);
+        if (movementTarget.magnitude > 1)
+            movementTarget.Normalize();
+        Vector2 current = -transform.up;
+
+        var angleLeft = Vector2.SignedAngle(current, movementTarget);
+        var rotSpeed = rigidbody.angularVelocity;
+        rotationForce = angleLeft*2 - rotSpeed;
+        rigidbody.AddTorque(rotationForce * rotationMultiplyer * Time.deltaTime);
+        rigidbody.angularVelocity = Mathf.Clamp(rigidbody.angularVelocity, -maxRotationSpeed, maxRotationSpeed);
+
+        //force
+        rigidbody.AddForce(-transform.up * acceleration * engineForce * Time.deltaTime);
 
         rigidbody.velocity = Vector3.ClampMagnitude(rigidbody.velocity, maxSpeed);
 
         //panning RCS
         rigidbody.AddForce(transform.right * -panCache * panForce * Time.deltaTime);
-
-        //directional assistant
-
-        //roation compensation RCS
-        if (Mathf.Abs(horizontalCache) < 0.1f)
-            rotationCompensation = -rigidbody.angularVelocity;
-        else
-            rotationCompensation = 0;
-        rigidbody.AddTorque(rotationCompensation * rotationCompensationMultiplyer * Time.deltaTime);
-
-        //rotation
-        rigidbody.AddTorque(rotationForce * -horizontalCache * Time.deltaTime);
-        rigidbody.angularVelocity = Mathf.Clamp(rigidbody.angularVelocity, -maxRotationSpeed, maxRotationSpeed);
-    }
-
-    private void SimpleControlSchemeUpdate()
-    {
-        Vector2 target = new Vector2(horizontalCache, verticalCache);
-        if (target.magnitude > 1)
-            target.Normalize();
-
-
-        Vector2 velocity = rigidbody.velocity;
-
-        Vector2 forceDir = ((target*maxSpeed) - velocity);
-
-        movementForce = forceDir;
-
-        rigidbody.AddForce(forceDir.normalized * target.magnitude * engineForce * Time.deltaTime);
-
-        rigidbody.velocity = Vector3.ClampMagnitude(rigidbody.velocity, maxSpeed);
-
     }
 
     public void Server_SetTeam(Team team)
@@ -262,15 +211,17 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         {
             stream.SendNext(horizontalCache);
             stream.SendNext(verticalCache);
-            stream.SendNext(rotationCompensation);
             stream.SendNext(panCache);
+            stream.SendNext(acceleration);
+            stream.SendNext(rotationForce);
         }
         else
         {
             horizontalCache = (float)stream.ReceiveNext();
             verticalCache = (float)stream.ReceiveNext();
-            rotationCompensation = (float)stream.ReceiveNext();
             panCache = (float)stream.ReceiveNext();
+            acceleration = (float)stream.ReceiveNext();
+            rotationForce = (float)stream.ReceiveNext();
         }
     }
 
@@ -311,6 +262,13 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
                     gun.StopFiring();
                 }
             }
+        }
+    }
+    public void OnAccelerate(InputAction.CallbackContext context)
+    {
+        if (AmOwningPilot())
+        {
+            acceleration = context.ReadValue<float>();
         }
     }
 }

@@ -19532,10 +19532,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b939891c330a7034f84cacf765544398, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  engineForce: 1000
-  rotationForce: 400
-  breakForce: 500
-  panForce: 500
+  engineForce: 500
+  rotationMultiplyer: 10
+  breakForce: 300
+  panForce: 300
   maxHealth: 100
   rotationCompensationMultiplyer: 3
   maxSpeed: 25
@@ -19557,7 +19557,7 @@ MonoBehaviour:
   rcsRightFront: {fileID: 3311430084639532052}
   rcsRightBack: {fileID: 3575437761605767760}
   rcsFront: {fileID: 6191533488676587544}
-  complexControlScheme: 1
+  complexControlScheme: 0
 --- !u!212 &6926503782011930025
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -19843,6 +19843,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 02bf8e60-f9c8-4a76-8aa7-a771f14335f3
     m_ActionName: Player/Pan[/Keyboard/q,/Keyboard/e]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6926503782011930027}
+        m_TargetAssemblyTypeName: Spaceship, Assembly-CSharp
+        m_MethodName: OnAccelerate
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 28b2bb14-1a76-4bbc-a501-c178961fa3a6
+    m_ActionName: Player/Acceleration[/DualShock4GamepadHID/rightTrigger]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
