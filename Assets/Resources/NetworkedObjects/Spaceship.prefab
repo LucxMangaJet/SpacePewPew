@@ -19842,7 +19842,7 @@ MonoBehaviour:
     m_ActionId: 02bf8e60-f9c8-4a76-8aa7-a771f14335f3
     m_ActionName: Player/Pan[/Keyboard/q,/Keyboard/e]
   m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
+  m_DefaultControlScheme: Gamepad
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
