@@ -19709,9 +19709,9 @@ MonoBehaviour:
   m_ActionEvents:
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6924988412913080273}
-        m_TargetAssemblyTypeName: GunnerPosition, Assembly-CSharp
-        m_MethodName: OnLook
+      - m_Target: {fileID: 6926503782011930027}
+        m_TargetAssemblyTypeName: Spaceship, Assembly-CSharp
+        m_MethodName: OnMoveInput
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

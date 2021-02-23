@@ -110,14 +110,9 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         rigidbody.velocity = Vector3.ClampMagnitude(rigidbody.velocity, maxSpeed);
 
         if (Mathf.Abs(horizontalCache) < 0.1f)
-        {
-            float rot = -rigidbody.angularVelocity;
-            rotationCompensation = rot;
-        }
+            rotationCompensation = -rigidbody.angularVelocity;
         else
-        {
             rotationCompensation = 0;
-        }
 
         rigidbody.AddTorque(rotationCompensation * rotationCompensationMultiplyer * Time.deltaTime);
         rigidbody.angularVelocity = Mathf.Clamp(rigidbody.angularVelocity, -maxRotationSpeed, maxRotationSpeed);
