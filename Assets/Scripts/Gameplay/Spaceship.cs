@@ -21,9 +21,9 @@ public interface IDamagable
 
 public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 {
-    [SerializeField] float engineForce, rotationMultiplyer, breakForce, panForce;
+    [SerializeField] float engineForce, breakForce, panForce;
     [SerializeField] float maxHealth;
-    [SerializeField] float rotationCompensationMultiplyer;
+    [SerializeField] float rotationRetargetingMultiplyer;
     [SerializeField] float maxSpeed, maxRotationSpeed;
 
     [Header("Components")]
@@ -138,15 +138,17 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 
     private void SimpleControlSchemeUpdate()
     {
-        movementTarget = new Vector2(horizontalCache, verticalCache);
-        if (movementTarget.magnitude > 1)
-            movementTarget.Normalize();
+        Vector2 newTarget = new Vector2(horizontalCache, verticalCache);
+        if (newTarget.magnitude >= 1)
+            newTarget.Normalize();
+        if (newTarget.magnitude >= 0.1f)
+            movementTarget = Vector3.Slerp(movementTarget, newTarget, newTarget.magnitude * Time.deltaTime * rotationRetargetingMultiplyer);
         Vector2 current = -transform.up;
 
         var angleLeft = Vector2.SignedAngle(current, movementTarget);
         var rotSpeed = rigidbody.angularVelocity;
-        rotationForce = angleLeft*2 - rotSpeed;
-        rigidbody.AddTorque(rotationForce * rotationMultiplyer * Time.deltaTime);
+        rotationForce = GetRotationForceToSolve(angleLeft, rotSpeed, 0.5f);
+        rigidbody.AddTorque(rotationForce * Time.deltaTime);
         rigidbody.angularVelocity = Mathf.Clamp(rigidbody.angularVelocity, -maxRotationSpeed, maxRotationSpeed);
 
         //force
@@ -157,6 +159,17 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         //panning RCS
         rigidbody.AddForce(transform.right * -panCache * panForce * Time.deltaTime);
     }
+
+    private float GetRotationForceToSolve(float angleLeft, float currentRotSpeed, float time)
+    {
+        //aleft = t*s0 + 0.5f*a*t*t
+        //a = (aleft - t*s0)/(0.5f*t*t)
+
+        float dividend = angleLeft - time * currentRotSpeed;
+        float divisor = 0.5f * time * time;
+        return dividend / divisor;
+    }
+
 
     public void Server_SetTeam(Team team)
     {

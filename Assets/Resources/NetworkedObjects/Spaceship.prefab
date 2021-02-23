@@ -19533,11 +19533,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   engineForce: 500
-  rotationMultiplyer: 10
   breakForce: 300
   panForce: 300
   maxHealth: 100
-  rotationCompensationMultiplyer: 3
+  rotationRetargetingMultiplyer: 5
   maxSpeed: 25
   maxRotationSpeed: 300
   teamColorsRenderer: {fileID: 6926503782296021030}
