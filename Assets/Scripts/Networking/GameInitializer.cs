@@ -6,7 +6,7 @@ using System;
 
 public class GameInitializer : MonoBehaviourPunCallbacks
 {
-    const string PREFABS_PATH = "NetworkedObjects/";
+   
 
     [SerializeField] GameObject playerCamPrefab;
     [SerializeField] GameObject spaceshipPrefab;
@@ -46,16 +46,16 @@ public class GameInitializer : MonoBehaviourPunCallbacks
 
     private void InitializePlayer()
     {
-        PhotonNetwork.Instantiate(PREFABS_PATH + playerCamPrefab.name, Vector3.zero, Quaternion.identity);
+        PhotonNetwork.Instantiate(ServiceLocator.PREFABS_PATH + playerCamPrefab.name, Vector3.zero, Quaternion.identity);
     }
 
     private void InitializeGame()
     {
         Debug.Log("Intitialize Game");
-        var spaceship1 = PhotonNetwork.Instantiate(PREFABS_PATH + spaceshipPrefab.name, new Vector3(-5, 0, 0), Quaternion.identity).GetComponent<Spaceship>();
+        var spaceship1 = PhotonNetwork.Instantiate(ServiceLocator.PREFABS_PATH + spaceshipPrefab.name, new Vector3(-5, 0, 0), Quaternion.identity).GetComponent<Spaceship>();
         spaceship1.Server_SetTeam(Team.Red);
 
-        var spaceship2 = PhotonNetwork.Instantiate(PREFABS_PATH + spaceshipPrefab.name, new Vector3(5,0,0), Quaternion.identity).GetComponent<Spaceship>();
+        var spaceship2 = PhotonNetwork.Instantiate(ServiceLocator.PREFABS_PATH + spaceshipPrefab.name, new Vector3(5,0,0), Quaternion.identity).GetComponent<Spaceship>();
         spaceship2.Server_SetTeam(Team.Blue);
     }
 

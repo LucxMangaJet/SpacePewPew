@@ -11,10 +11,12 @@ public enum Location
 
 public class ServiceLocator : MonoBehaviour
 {
+    public const string PREFABS_PATH = "NetworkedObjects/";
+
     static ServiceLocator instance;
 
     Dictionary<LocationDescription, Transform> locations = new Dictionary<LocationDescription, Transform>();
-    
+
     private void Awake()
     {
         if (instance == null)

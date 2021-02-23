@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering.Universal;
 
 //Maybe write own client side prediction: https://www.kinematicsoup.com/news/2017/5/30/multiplayerprediction
 
@@ -14,8 +15,12 @@ public class Spaceship : MonobehaviourPunPew
     [SerializeField] SpriteRenderer teamColorsRenderer;
     [SerializeField] Transform cockpitCamTarget, weapon1CamTarget, lightSource;
     [SerializeField] new Rigidbody2D rigidbody;
+    [SerializeField] new Light2D light;
 
     private Team owningTeam;
+
+    public Team Team { get => owningTeam; }
+
 
     private void Update()
     {
@@ -65,6 +70,8 @@ public class Spaceship : MonobehaviourPunPew
 
         ServiceLocator.SetLocation(team, Location.Cockpit, cockpitCamTarget);
         ServiceLocator.SetLocation(team, Location.Weapon1, weapon1CamTarget);
+
+        light.gameObject.SetActive(team == GetLocalTeam());
     }
 
 }
