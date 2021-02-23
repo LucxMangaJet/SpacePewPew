@@ -43,6 +43,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     private float rotationCompensation;
 
     private Vector3 directionalLightOffset;
+    private Quaternion directionalLightRotation;
 
     public System.Action<Spaceship> HealthChanged;
 
@@ -63,6 +64,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     {
         base.Start();
         directionalLightOffset = directionalLight.transform.localPosition;
+        directionalLightRotation = directionalLight.transform.rotation;
     }
 
     private void Update()
@@ -92,6 +94,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     private void UpdateEffects()
     {
         directionalLight.transform.position = transform.position + directionalLightOffset;
+        directionalLight.transform.rotation = directionalLightRotation;
 
         //engines breaks
         var emission = enginePS.emission;
