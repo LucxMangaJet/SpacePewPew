@@ -5,10 +5,12 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 using System.Linq;
+using Photon.Pun;
 
 public class BattleUI : MonoBehaviour
 {
     [SerializeField] TeamUI[] teamUIs;
+    [SerializeField] RectTransform minimapRedShip, minimapBlueShip;
 
     private void Start()
     {
@@ -29,6 +31,29 @@ public class BattleUI : MonoBehaviour
         {
             var spaceship = ServiceLocator.GetSpaceship(teamUI.Team);
             spaceship.HealthChanged += OnHealthChanged;
+        }
+    }
+
+    private void Update()
+    {
+        var localTeam = PhotonNetwork.LocalPlayer.GetTeam();
+
+        if (localTeam == Team.None)
+            return;
+
+        if (localTeam == Team.Red)
+        {
+            minimapRedShip.anchoredPosition = Vector2.zero;
+            var myShip = ServiceLocator.GetLocation(Team.Red, Location.Cockpit);
+            var enemyShip = ServiceLocator.GetLocation(Team.Blue, Location.Cockpit);
+            minimapBlueShip.anchoredPosition = (enemyShip - myShip)*0.5f;
+        }
+        else
+        {
+            minimapBlueShip.anchoredPosition = Vector2.zero;
+            var myShip = ServiceLocator.GetLocation(Team.Blue, Location.Cockpit);
+            var enemyShip = ServiceLocator.GetLocation(Team.Red, Location.Cockpit);
+            minimapRedShip.anchoredPosition = (enemyShip - myShip)*0.5f;
         }
     }
 
