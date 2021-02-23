@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using UnityEngine.Experimental.Rendering.Universal;
 
 public class Bullet : MonobehaviourPunPew, IPunInstantiateMagicCallback
 {
@@ -10,6 +11,7 @@ public class Bullet : MonobehaviourPunPew, IPunInstantiateMagicCallback
     [SerializeField] float damage;
     [SerializeField] new Rigidbody2D rigidbody2D;
     [SerializeField] SpriteRenderer spriteRenderer;
+    [SerializeField] new Light2D light;
     Team team;
 
     public Team Team { get => team; }
@@ -34,6 +36,7 @@ public class Bullet : MonobehaviourPunPew, IPunInstantiateMagicCallback
         var data = photonView.InstantiationData;
         team = (Team)data[0];
         spriteRenderer.color = team.ToColor();
+        light.color = team.ToColor();
         //negative because gun faces down instead of up
         Vector3 baseVel = (Vector2)data[1];
         rigidbody2D.velocity = baseVel - transform.up * speed;
