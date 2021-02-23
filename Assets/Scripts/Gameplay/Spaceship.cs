@@ -27,6 +27,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     [SerializeField] new Light2D light;
     [SerializeField] ParticleSystem enginePS;
     [SerializeField] Transform engineTransform;
+    [SerializeField] Gun[] pilotGuns;
 
     [SerializeField] ParticleSystem rcsLeft, rcsRight;
 
@@ -44,6 +45,8 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     public float Health { get => health; }
 
     public float MaxHealth { get => maxHealth; }
+
+    public Rigidbody2D Rigidbody { get => rigidbody; }
 
     protected override void OnAllReady()
     {
@@ -73,7 +76,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     private void UpdateEffects()
     {
         var emission = enginePS.emission;
-        emission.rateOverTimeMultiplier = Mathf.Lerp(10, 2000, Mathf.Abs(Mathf.Max(0,verticalCache)));
+        emission.rateOverTimeMultiplier = Mathf.Lerp(10, 2000, Mathf.Abs(Mathf.Max(0, verticalCache)));
 
         emission = rcsLeft.emission;
         emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(horizontalCache, -rotationCompensation / 20)));
@@ -89,7 +92,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 
         //Spaceship sprite is upsidedown, thats why there are "-"
         rigidbody.AddTorque(rotationForce * -horizontalCache * Time.deltaTime);
-        rigidbody.AddForce(transform.up * Mathf.Min(-0.05f,-verticalCache) * engineForce * Time.deltaTime);
+        rigidbody.AddForce(transform.up * Mathf.Min(-0.05f, -verticalCache) * engineForce * Time.deltaTime);
 
         if (Mathf.Abs(horizontalCache) < 0.1f)
         {
@@ -103,6 +106,20 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 
         rigidbody.AddTorque(rotationCompensation * rotationCompensationMultiplyer * Time.deltaTime);
 
+        if (Input.GetMouseButtonDown(0))
+        {
+            foreach (var gun in pilotGuns)
+            {
+                gun.StartFiring(Rigidbody, Team);
+            }
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            foreach (var gun in pilotGuns)
+            {
+                gun.StopFiring();
+            }
+        }
     }
 
     public void Server_SetTeam(Team team)

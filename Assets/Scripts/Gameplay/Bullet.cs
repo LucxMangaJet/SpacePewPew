@@ -28,7 +28,8 @@ public class Bullet : MonobehaviourPunPew, IPunInstantiateMagicCallback
         team = (Team)data[0];
         spriteRenderer.color = team.ToColor();
         //negative because gun faces down instead of up
-        rigidbody2D.velocity = -transform.up * speed;
+        Vector3 baseVel = (Vector2)data[1];
+        rigidbody2D.velocity = baseVel - transform.up * speed;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

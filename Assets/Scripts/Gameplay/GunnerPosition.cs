@@ -4,14 +4,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ControllableGun : MonobehaviourPunPew
+public class GunnerPosition : MonobehaviourPunPew
 {
-    [SerializeField] GameObject bulletPrefab;
-    [SerializeField] Transform bulletSpawnPoint;
     [SerializeField] Spaceship spaceship;
+    [SerializeField] Gun gun;
     Camera camera;
 
-    private void Start()
+    protected override void Start()
     {
         camera = Camera.main;
     }
@@ -38,12 +37,14 @@ public class ControllableGun : MonobehaviourPunPew
     {
         Vector2 mousePos = Input.mousePosition - new Vector3(Screen.width/2, Screen.height/2);
         transform.up = -mousePos.normalized;
+
         if (Input.GetMouseButtonDown(0))
         {
-            string path = ServiceLocator.PREFABS_PATH + bulletPrefab.name;
-            object[] spawnData = { spaceship.Team };
-
-            PhotonNetwork.Instantiate(path, bulletSpawnPoint.position, transform.rotation, 0, spawnData);
+            gun.StartFiring(spaceship.Rigidbody, spaceship.Team);
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            gun.StopFiring();
         }
     }
 }

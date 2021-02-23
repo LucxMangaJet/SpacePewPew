@@ -4804,6 +4804,52 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!1 &1350898226719798341
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1312229069658156699}
+  - component: {fileID: 8667734055988066958}
+  m_Layer: 0
+  m_Name: PilotGun2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1312229069658156699
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1350898226719798341}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.93, y: -2.77, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 6926503782011930029}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8667734055988066958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1350898226719798341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42db396c909b5af4191d0f35380df1bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletPrefab: {fileID: 464339766847847247, guid: 0e0c6b5feccd4674c8b9d6ba40d8f66e, type: 3}
+  bulletSpawnPoint: {fileID: 1312229069658156699}
+  fireRate: 3
 --- !u!1 &3722661500037169531
 GameObject:
   m_ObjectHideFlags: 0
@@ -4936,6 +4982,52 @@ Transform:
   m_Father: {fileID: 6926503782011930029}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5438059503824074563
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1822182715451666120}
+  - component: {fileID: 3532146867853208867}
+  m_Layer: 0
+  m_Name: PilotGun1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1822182715451666120
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5438059503824074563}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1, y: -2.81, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 6926503782011930029}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3532146867853208867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5438059503824074563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42db396c909b5af4191d0f35380df1bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletPrefab: {fileID: 464339766847847247, guid: 0e0c6b5feccd4674c8b9d6ba40d8f66e, type: 3}
+  bulletSpawnPoint: {fileID: 1822182715451666120}
+  fireRate: 3
 --- !u!1 &6926503782011930018
 GameObject:
   m_ObjectHideFlags: 0
@@ -4977,6 +5069,8 @@ Transform:
   - {fileID: 7163452392800116896}
   - {fileID: 7287955237587231569}
   - {fileID: 8389360203804841522}
+  - {fileID: 1822182715451666120}
+  - {fileID: 1312229069658156699}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5003,6 +5097,9 @@ MonoBehaviour:
   light: {fileID: 4096861372973626075}
   enginePS: {fileID: 6299550351943362529}
   engineTransform: {fileID: 7163452392800116896}
+  pilotGuns:
+  - {fileID: 3532146867853208867}
+  - {fileID: 8667734055988066958}
   rcsLeft: {fileID: 1052893625401926264}
   rcsRight: {fileID: 3311430084639532052}
 --- !u!212 &6926503782011930025
@@ -14833,11 +14930,12 @@ GameObject:
   m_Component:
   - component: {fileID: 7800902029274864684}
   - component: {fileID: 6924988412913080273}
+  - component: {fileID: 5937008088457899123}
   - component: {fileID: 3022789432082961681}
   - component: {fileID: 820356704706055028}
   - component: {fileID: 2147357680112785228}
   m_Layer: 0
-  m_Name: Gun
+  m_Name: GunnerGun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14870,9 +14968,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df21d72f55ed56c4fa790a07fe5c4fe4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spaceship: {fileID: 6926503782011930027}
+  gun: {fileID: 5937008088457899123}
+--- !u!114 &5937008088457899123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7799502620420740189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42db396c909b5af4191d0f35380df1bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 464339766847847247, guid: 0e0c6b5feccd4674c8b9d6ba40d8f66e, type: 3}
   bulletSpawnPoint: {fileID: 1577745491225268553}
-  spaceship: {fileID: 6926503782011930027}
+  fireRate: 10
 --- !u!212 &3022789432082961681
 SpriteRenderer:
   m_ObjectHideFlags: 0
