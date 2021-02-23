@@ -57,10 +57,16 @@ public class ServiceLocator : MonoBehaviour
         instance.InternalSetLocation(team, location, locationTarget);
     }
 
+    public static Transform GetLocationTransform(Team team, Location location)
+    {
+        AssertSingleton();
+        return instance.InternalGetLocationTransform(team, location);
+    }
+
     public static Vector3 GetLocation(Team team, Location location)
     {
         AssertSingleton();
-        return instance.InternalGetLocation(team, location);
+        return instance.InternalGetLocationTransform(team, location).position;
     }
 
     public static void AssertSingleton()
@@ -82,7 +88,7 @@ public class ServiceLocator : MonoBehaviour
         }
     }
 
-    private Vector3 InternalGetLocation(Team team, Location location)
+    private Transform InternalGetLocationTransform(Team team, Location location)
     {
         var desc = new LocationDescription(team, location);
         if (locations.ContainsKey(desc))
@@ -91,7 +97,7 @@ public class ServiceLocator : MonoBehaviour
             if (t == null)
                 throw new System.Exception("ServiceLocator nullrefexception");
 
-            return t.position;
+            return t;
         }
         else
         {

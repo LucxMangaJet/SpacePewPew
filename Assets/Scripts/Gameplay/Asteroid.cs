@@ -9,7 +9,7 @@ public class Asteroid : MonobehaviourPunPew
     [SerializeField] new Rigidbody2D rigidbody;
 
 
-    private void Start()
+    protected override void OnAllReady()
     {
         if (photonView.IsMine)
         {
