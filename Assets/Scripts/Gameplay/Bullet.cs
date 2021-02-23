@@ -7,9 +7,12 @@ public class Bullet : MonobehaviourPunPew, IPunInstantiateMagicCallback
 {
     [SerializeField] float speed;
     [SerializeField] float lifetime;
+    [SerializeField] float damage;
     [SerializeField] new Rigidbody2D rigidbody2D;
     [SerializeField] SpriteRenderer spriteRenderer;
     Team team;
+
+    public Team Team { get => team; }
 
     private void Start()
     {
@@ -28,10 +31,14 @@ public class Bullet : MonobehaviourPunPew, IPunInstantiateMagicCallback
         rigidbody2D.velocity = -transform.up * speed;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (photonView.IsMine)
+        if (PhotonNetwork.IsMasterClient)
         {
+            if(collision.TryGetComponent(out IDamagable damagable))
+            {
+                damagable.TakeDamage(this, damage);
+            }
             Destroy(gameObject);
         }
     }

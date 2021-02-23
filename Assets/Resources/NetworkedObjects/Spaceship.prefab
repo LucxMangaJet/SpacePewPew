@@ -326,11 +326,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   engineForce: 200
   rotationForce: 150
-  lightDistance: -15.99
+  maxHealth: 100
   teamColorsRenderer: {fileID: 6926503782296021030}
   cockpitCamTarget: {fileID: 6816321587762030669}
   weapon1CamTarget: {fileID: 3495063541378357082}
-  lightSource: {fileID: 4211771055689000379}
   rigidbody: {fileID: 6926503782011930031}
   light: {fileID: 4096861372973626075}
 --- !u!212 &6926503782011930025

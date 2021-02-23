@@ -3,17 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using System;
+using Photon.Realtime;
 
-public class GameInitializer : MonoBehaviourPunCallbacks
+public class GameHandler : MonoBehaviourPunCallbacks
 {
-   
-
     [SerializeField] GameObject playerCamPrefab;
     [SerializeField] GameObject spaceshipPrefab;
 
     [Header("LOCAL MODE DEBUG")]
     [SerializeField] Team localTeam;
     [SerializeField] PlayerRole localRole;
+
+    Dictionary<Player, bool> playersReadyStates = new Dictionary<Player, bool>();
+    public event System.Action AllReady;
+
+    private void Awake()
+    {
+        ServiceLocator.SetGameHandler(this);
+    }
 
     private void Start()
     {
@@ -27,10 +34,35 @@ public class GameInitializer : MonoBehaviourPunCallbacks
         }
     }
 
+    public void NotifyPlayerJoined(Player player)
+    {
+        playersReadyStates[player] = true;
+        if (AllPlayersReady())
+        {
+            Debug.Log("All players ready!");
+            AllReady?.Invoke();
+        }
+    }
+
+    private bool AllPlayersReady()
+    {
+        foreach (var state in playersReadyStates)
+        {
+            if (!state.Value)
+                return false;
+        }
+        return true;
+    }
+
     private void Initialize()
     {
         if (PhotonNetwork.IsConnected)
         {
+            foreach (var player in PhotonNetwork.CurrentRoom.Players.Values)
+            {
+                playersReadyStates.Add(player, false);
+            }
+
             if (PhotonNetwork.IsMasterClient)
             {
                 InitializeGame();
@@ -40,7 +72,7 @@ public class GameInitializer : MonoBehaviourPunCallbacks
         }
         else
         {
-            Debug.Log("Not connected to photon network");
+            Debug.LogError("Not connected to photon network");
         }
     }
 
@@ -73,7 +105,7 @@ public class GameInitializer : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.LocalPlayer.SetTeam(localTeam);
             PhotonNetwork.LocalPlayer.SetRole(localRole);
-
+            PhotonNetwork.LocalPlayer.NickName = "Local Player";
             Initialize();
         }
     }

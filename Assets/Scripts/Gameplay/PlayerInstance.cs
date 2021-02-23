@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerCamera : MonobehaviourPunPew
+public class PlayerInstance : MonobehaviourPunPew
 {
     [SerializeField] Vector3 offset;
     [SerializeField] Behaviour[] toDisableOnOthers;
@@ -21,12 +21,13 @@ public class PlayerCamera : MonobehaviourPunPew
             foreach (var c in toDisableOnOthers)
                 c.enabled = false;
         }
-        
+
+        ServiceLocator.GetGameHandler().NotifyPlayerJoined(photonView.Owner);
     }
 
     private void UpdateTargetsBasedOnRole()
     {
-        var player = PhotonNetwork.LocalPlayer;
+        var player = photonView.Owner;
 
         team = player.GetTeam();
 
@@ -47,6 +48,9 @@ public class PlayerCamera : MonobehaviourPunPew
 
     private void Update()
     {
+        if (!photonView.IsMine)
+            return;
+
         if (viewTarget == Location.None)
         {
             //add spectator control
