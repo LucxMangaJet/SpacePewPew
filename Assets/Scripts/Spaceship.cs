@@ -19,6 +19,8 @@ public class Spaceship : MonobehaviourPunPew
 
     private Team owningTeam;
 
+    public Team Team { get => owningTeam; }
+
 
     private void Update()
     {
