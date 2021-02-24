@@ -11,8 +11,8 @@ using UnityEngine.InputSystem;
 //Maybe write own client side prediction: https://www.kinematicsoup.com/news/2017/5/30/multiplayerprediction
 // add slowdown sideways force
 // give panning thrusters different colors/speeds
-// add more manouvrability control on move (moving less should move slower etc)
 // add faster slowdown than speedup
+//add boost
 
 public interface IDamagable
 {
@@ -21,7 +21,7 @@ public interface IDamagable
 
 public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 {
-    [SerializeField] float engineForce, breakForce, panForce;
+    [SerializeField] float engineForce, breakForce, rcsPanThrusterForce, sasHorizontalAssistMultiplyer;
     [SerializeField] float maxHealth;
     [SerializeField] float rotationRetargetingMultiplyer;
     [SerializeField] float maxSpeed, maxRotationSpeed;
@@ -37,7 +37,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     [SerializeField] Gun[] pilotGuns;
 
 
-    [SerializeField] ParticleSystem rcsLeftFront, rcsLeftBack, rcsRightFront, rcsRightBack, rcsFront;
+    [SerializeField] ParticleSystem rcsRotationLeft, rcsPanLeft, rcsRotationRight, rcsPanRight, rcsFront, sasLeft, sasRight;
 
     private Team owningTeam;
     private float health;
@@ -47,12 +47,11 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     private float panCache;
     private float acceleration;
     private float rotationForce;
+    private float sasStrength;
 
     private Vector2 movementTarget;
     private Vector3 directionalLightOffset;
     private Quaternion directionalLightRotation;
-
-    [SerializeField] bool complexControlScheme = false;
 
     public System.Action<Spaceship> HealthChanged;
 
@@ -108,26 +107,34 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         directionalLight.transform.rotation = directionalLightRotation;
 
 
-        //engines breaks
+        //engines 
         var emission = enginePS.emission;
-        emission.rateOverTimeMultiplier = Mathf.Lerp(10, 2000, Mathf.Max(0, acceleration));
+        emission.rateOverTimeMultiplier = Mathf.LerpUnclamped(10, 2000, Mathf.Max(0, acceleration));
 
+        //TODO add breakes
         //emission = rcsFront.emission;
         //emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, topStrength)));
 
-        //front 
-        emission = rcsLeftFront.emission;
-        emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, -rotationForce * 0.1f, panCache)));
+        //RCS Rotation 
+        emission = rcsRotationLeft.emission;
+        emission.rateOverTimeMultiplier = Mathf.Max(0, -rotationForce);
 
-        emission = rcsRightFront.emission;
-        emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, rotationForce * 0.1f, -panCache)));
+        emission = rcsRotationRight.emission;
+        emission.rateOverTimeMultiplier = Mathf.Max(0, rotationForce);
 
-        //back
-        emission = rcsLeftBack.emission;
-        emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, panCache)));
+        //RCS Pan
+        emission = rcsPanLeft.emission;
+        emission.rateOverTimeMultiplier = Mathf.Max(0, panCache * rcsPanThrusterForce);
 
-        emission = rcsRightBack.emission;
-        emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, -panCache)));
+        emission = rcsPanRight.emission;
+        emission.rateOverTimeMultiplier = Mathf.Max(0, -panCache * rcsPanThrusterForce);
+
+        //SAS Horizontal assist
+        emission = sasLeft.emission;
+        emission.rateOverTimeMultiplier = Mathf.Max(0, -sasStrength);
+
+        emission = sasRight.emission;
+        emission.rateOverTimeMultiplier = Mathf.Max(0, sasStrength);
 
     }
 
@@ -154,10 +161,21 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         //force
         rigidbody.AddForce(-transform.up * acceleration * engineForce * Time.deltaTime);
 
-        rigidbody.velocity = Vector3.ClampMagnitude(rigidbody.velocity, maxSpeed);
 
-        //panning RCS
-        rigidbody.AddForce(transform.right * -panCache * panForce * Time.deltaTime);
+
+        if (Mathf.Abs(panCache) > 0.1f)
+        {
+            //panning RCS
+            rigidbody.AddForce(transform.right * -panCache * rcsPanThrusterForce * Time.deltaTime);
+        }
+        else
+        {
+            //autocorrection SAS
+            sasStrength = -Vector2.Dot(transform.right, rigidbody.velocity) * sasHorizontalAssistMultiplyer;
+            rigidbody.AddForce(transform.right * sasStrength * Time.deltaTime);
+        }
+
+        rigidbody.velocity = Vector3.ClampMagnitude(rigidbody.velocity, maxSpeed);
     }
 
     private float GetRotationForceToSolve(float angleLeft, float currentRotSpeed, float time)
