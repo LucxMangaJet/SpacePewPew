@@ -9,9 +9,6 @@ using UnityEngine.Experimental.Rendering.Universal;
 using UnityEngine.InputSystem;
 
 //Maybe write own client side prediction: https://www.kinematicsoup.com/news/2017/5/30/multiplayerprediction
-// add slowdown sideways force
-// give panning thrusters different colors/speeds
-// add faster slowdown than speedup
 //add boost
 
 public interface IDamagable
@@ -45,7 +42,8 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     private float verticalCache;
     private float horizontalCache;
     private float panCache;
-    private float acceleration;
+    private float accelerationCache;
+    private float breaksCache;
     private float rotationForce;
     private float sasStrength;
 
@@ -109,11 +107,11 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 
         //engines 
         var emission = enginePS.emission;
-        emission.rateOverTimeMultiplier = Mathf.LerpUnclamped(10, 2000, Mathf.Max(0, acceleration));
+        emission.rateOverTimeMultiplier = Mathf.LerpUnclamped(10, 2000, Mathf.Max(0, accelerationCache));
 
-        //TODO add breakes
-        //emission = rcsFront.emission;
-        //emission.rateOverTimeMultiplier = (Mathf.Lerp(0, 300, Mathf.Max(0, topStrength)));
+        //breakes
+        emission = rcsFront.emission;
+        emission.rateOverTimeMultiplier = Mathf.Max(0, breaksCache * breakForce);
 
         //RCS Rotation 
         emission = rcsRotationLeft.emission;
@@ -145,6 +143,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 
     private void SimpleControlSchemeUpdate()
     {
+        //targeting
         Vector2 newTarget = new Vector2(horizontalCache, verticalCache);
         if (newTarget.magnitude >= 1)
             newTarget.Normalize();
@@ -158,10 +157,11 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         rigidbody.AddTorque(rotationForce * Time.deltaTime);
         rigidbody.angularVelocity = Mathf.Clamp(rigidbody.angularVelocity, -maxRotationSpeed, maxRotationSpeed);
 
-        //force
-        rigidbody.AddForce(-transform.up * acceleration * engineForce * Time.deltaTime);
+        //engines
+        rigidbody.AddForce(-transform.up * accelerationCache * engineForce * Time.deltaTime);
 
-
+        //breakes
+        rigidbody.AddForce(transform.up * breaksCache * breakForce * Time.deltaTime);
 
         if (Mathf.Abs(panCache) > 0.1f)
         {
@@ -247,16 +247,20 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
             stream.SendNext(horizontalCache);
             stream.SendNext(verticalCache);
             stream.SendNext(panCache);
-            stream.SendNext(acceleration);
+            stream.SendNext(accelerationCache);
+            stream.SendNext(breaksCache);
             stream.SendNext(rotationForce);
+            stream.SendNext(sasStrength);
         }
         else
         {
             horizontalCache = (float)stream.ReceiveNext();
             verticalCache = (float)stream.ReceiveNext();
             panCache = (float)stream.ReceiveNext();
-            acceleration = (float)stream.ReceiveNext();
+            accelerationCache = (float)stream.ReceiveNext();
+            breaksCache = (float)stream.ReceiveNext();
             rotationForce = (float)stream.ReceiveNext();
+            sasStrength = (float)stream.ReceiveNext();
         }
     }
 
@@ -303,7 +307,15 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     {
         if (AmOwningPilot())
         {
-            acceleration = context.ReadValue<float>();
+            accelerationCache = context.ReadValue<float>();
+        }
+    }
+
+    public void OnBreak(InputAction.CallbackContext context)
+    {
+        if (AmOwningPilot())
+        {
+            breaksCache = context.ReadValue<float>();
         }
     }
 }
