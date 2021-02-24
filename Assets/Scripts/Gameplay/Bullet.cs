@@ -50,6 +50,10 @@ public class Bullet : MonobehaviourPunPew, IPunInstantiateMagicCallback
             {
                 damagable.TakeDamage(this, damage);
             }
+        }
+
+        if (photonView.IsMine)
+        {
             PhotonNetwork.Destroy(gameObject);
         }
     }
