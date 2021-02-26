@@ -19542,6 +19542,7 @@ MonoBehaviour:
   rotationRetargetingMultiplyer: 5
   maxSpeed: 25
   maxRotationSpeed: 300
+  collisionDamageMultipliyer: 0.5
   teamColorsRenderer: {fileID: 6926503782296021030}
   cockpitCamTarget: {fileID: 6816321587762030669}
   weapon1CamTarget: {fileID: 3495063541378357082}

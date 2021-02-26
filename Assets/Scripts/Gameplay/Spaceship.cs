@@ -23,7 +23,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     [SerializeField] float maxHealth;
     [SerializeField] float rotationRetargetingMultiplyer;
     [SerializeField] float maxSpeed, maxRotationSpeed;
-    [SerializeField] float collisionMultipliyer = 1;
+    [SerializeField] float collisionDamageMultipliyer = 1;
 
     [Header("Components")]
     [SerializeField] SpriteRenderer teamColorsRenderer;
@@ -337,7 +337,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 
             var impactMultiplyer = 0.5f + Mathf.Min(90f, Vector3.Angle(-transform.up, p - transform.position)) / 90;
 
-            var damage = collisionMultipliyer * impactMultiplyer * collision.relativeVelocity.magnitude;
+            var damage = collisionDamageMultipliyer * impactMultiplyer * collision.relativeVelocity.magnitude;
             Server_SetHealth(health - damage);
         }
     }
