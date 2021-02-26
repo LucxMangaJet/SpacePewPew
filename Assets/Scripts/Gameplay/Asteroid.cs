@@ -7,6 +7,8 @@ public class Asteroid : MonobehaviourPunPew
 {
     [SerializeField] Vector2 startRotationMinMax;
     [SerializeField] new Rigidbody2D rigidbody;
+    [SerializeField] Transform lightTransform;
+    [SerializeField] Vector3 lightOffset;
 
 
     protected override void OnAllReady()
@@ -16,5 +18,10 @@ public class Asteroid : MonobehaviourPunPew
             float value = Mathf.Lerp(startRotationMinMax.x, startRotationMinMax.y, Random.value);
             rigidbody.AddTorque(value, ForceMode2D.Impulse);
         }
+    }
+
+    private void Update()
+    {
+        lightTransform.position = transform.position + lightOffset;
     }
 }
