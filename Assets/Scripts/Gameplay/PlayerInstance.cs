@@ -57,8 +57,9 @@ public class PlayerInstance : MonobehaviourPunPew
         }
         else
         {
-            var target = ServiceLocator.GetLocation(team, viewTarget);
-            transform.position = target + offset;
+            var target = ServiceLocator.GetLocationTransform(team, viewTarget);
+            if (target != null)
+                transform.position = target.position + offset;
         }
     }
 }

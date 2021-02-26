@@ -62,11 +62,6 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 
     public Rigidbody2D Rigidbody { get => rigidbody; }
 
-    protected override void OnAllReady()
-    {
-        health = maxHealth;
-    }
-
     protected override void Start()
     {
         playerInput.SwitchCurrentControlScheme(Gamepad.current);
@@ -74,6 +69,9 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         base.Start();
         directionalLightOffset = directionalLight.transform.localPosition;
         directionalLightRotation = directionalLight.transform.rotation;
+
+        health = maxHealth;
+        HealthChanged?.Invoke(this);
     }
 
     private void Update()

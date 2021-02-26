@@ -20,6 +20,7 @@ public class GameHandler : MonoBehaviourPunCallbacks
     Dictionary<Team, int> scores = new Dictionary<Team, int>();
     public event System.Action ScoreChanged;
 
+    public event System.Action<Spaceship> OnSpaceshipSpawned;
 
 
     private void Awake()
@@ -102,24 +103,39 @@ public class GameHandler : MonoBehaviourPunCallbacks
     private void InitializeGame()
     {
         Debug.Log("Intitialize Game");
-        var spaceship1 = PhotonNetwork.Instantiate(ServiceLocator.PREFABS_PATH + spaceshipPrefab.name, new Vector3(-5, 0, 0), Quaternion.identity).GetComponent<Spaceship>();
-        spaceship1.Server_SetTeam(Team.Red);
-        spaceship1.Destroyed += OnDestroyedSpaceship;
+        Respawn(Team.Red);
+        Respawn(Team.Blue);
 
-        var spaceship2 = PhotonNetwork.Instantiate(ServiceLocator.PREFABS_PATH + spaceshipPrefab.name, new Vector3(5, 0, 0), Quaternion.identity).GetComponent<Spaceship>();
-        spaceship2.Server_SetTeam(Team.Blue);
-        spaceship2.Destroyed += OnDestroyedSpaceship;
     }
 
     private void OnDestroyedSpaceship(Spaceship obj)
     {
         Debug.Log(obj.Team + " destroyed");
+        obj.Destroyed -= OnDestroyedSpaceship;
+
         if (obj.Team == Team.Blue)
             Server_AddScore(Team.Red);
         else
             Server_AddScore(Team.Blue);
 
         ScoreChanged?.Invoke();
+
+        Respawn(obj.Team);
+    }
+
+    private void Respawn(Team team)
+    {
+        var spaceship = PhotonNetwork.Instantiate(ServiceLocator.PREFABS_PATH + spaceshipPrefab.name, new Vector3(10 * ((int)team), 0, 0), Quaternion.identity).GetComponent<Spaceship>();
+        spaceship.Server_SetTeam(team);
+        spaceship.Destroyed += OnDestroyedSpaceship;
+        photonView.RPC(nameof(RPC_SpaceshipSpawned), RpcTarget.All, team);
+    }
+
+    [PunRPC]
+    private void RPC_SpaceshipSpawned(Team t)
+    {
+        var sp = ServiceLocator.GetSpaceship(t);
+        OnSpaceshipSpawned?.Invoke(sp);
     }
 
     public override void OnConnectedToMaster()

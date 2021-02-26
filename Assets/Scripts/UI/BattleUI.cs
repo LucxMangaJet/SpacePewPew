@@ -20,9 +20,13 @@ public class BattleUI : MonoBehaviour
         gameHandler = ServiceLocator.GetGameHandler();
         gameHandler.AllReady += OnAllReady;
         gameHandler.ScoreChanged += OnScoreChanged;
+        gameHandler.OnSpaceshipSpawned += OnSpaceshipSpawned;
     }
 
-
+    private void OnSpaceshipSpawned(Spaceship obj)
+    {
+        obj.HealthChanged += OnHealthChanged;
+    }
 
     private void OnDestroy()
     {
@@ -42,12 +46,6 @@ public class BattleUI : MonoBehaviour
     private void OnAllReady()
     {
         RefreshUI();
-
-        foreach (var teamUI in teamUIs)
-        {
-            var spaceship = ServiceLocator.GetSpaceship(teamUI.Team);
-            spaceship.HealthChanged += OnHealthChanged;
-        }
     }
 
     private void Update()
