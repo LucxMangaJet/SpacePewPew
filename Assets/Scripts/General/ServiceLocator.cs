@@ -94,9 +94,6 @@ public class ServiceLocator : MonoBehaviour
         if (locations.ContainsKey(desc))
         {
             var t = locations[desc];
-            if (t == null)
-                throw new System.Exception("ServiceLocator nullrefexception");
-
             return t;
         }
         else

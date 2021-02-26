@@ -11,16 +11,32 @@ public class BattleUI : MonoBehaviour
 {
     [SerializeField] TeamUI[] teamUIs;
     [SerializeField] RectTransform minimapRedShip, minimapBlueShip;
+    [SerializeField] TMP_Text redScore, blueScore;
+
+    GameHandler gameHandler;
 
     private void Start()
     {
-        ServiceLocator.GetGameHandler().AllReady += OnAllReady;
+        gameHandler = ServiceLocator.GetGameHandler();
+        gameHandler.AllReady += OnAllReady;
+        gameHandler.ScoreChanged += OnScoreChanged;
     }
+
+
 
     private void OnDestroy()
     {
-        if (ServiceLocator.IsValid())
-            ServiceLocator.GetGameHandler().AllReady -= OnAllReady;
+        if (gameHandler != null)
+        {
+            gameHandler.AllReady -= OnAllReady;
+            gameHandler.ScoreChanged -= OnScoreChanged;
+        }
+    }
+
+    private void OnScoreChanged()
+    {
+        redScore.text = gameHandler.GetScoreOf(Team.Red).ToString();
+        blueScore.text = gameHandler.GetScoreOf(Team.Blue).ToString();
     }
 
     private void OnAllReady()
@@ -44,16 +60,20 @@ public class BattleUI : MonoBehaviour
         if (localTeam == Team.Red)
         {
             minimapRedShip.anchoredPosition = Vector2.zero;
-            var myShip = ServiceLocator.GetLocation(Team.Red, Location.Cockpit);
-            var enemyShip = ServiceLocator.GetLocation(Team.Blue, Location.Cockpit);
-            minimapBlueShip.anchoredPosition = (enemyShip - myShip)*0.5f;
+            var myShip = ServiceLocator.GetLocationTransform(Team.Red, Location.Cockpit);
+            var enemyShip = ServiceLocator.GetLocationTransform(Team.Blue, Location.Cockpit);
+
+            if (myShip != null && enemyShip != null)
+                minimapBlueShip.anchoredPosition = (enemyShip.position - myShip.position) * 0.5f;
         }
         else
         {
             minimapBlueShip.anchoredPosition = Vector2.zero;
-            var myShip = ServiceLocator.GetLocation(Team.Blue, Location.Cockpit);
-            var enemyShip = ServiceLocator.GetLocation(Team.Red, Location.Cockpit);
-            minimapRedShip.anchoredPosition = (enemyShip - myShip)*0.5f;
+            var myShip = ServiceLocator.GetLocationTransform(Team.Blue, Location.Cockpit);
+            var enemyShip = ServiceLocator.GetLocationTransform(Team.Red, Location.Cockpit);
+
+            if (myShip != null && enemyShip != null)
+                minimapRedShip.anchoredPosition = (enemyShip.position - myShip.position) * 0.5f;
         }
     }
 

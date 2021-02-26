@@ -51,7 +51,8 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     private Vector3 directionalLightOffset;
     private Quaternion directionalLightRotation;
 
-    public System.Action<Spaceship> HealthChanged;
+    public event System.Action<Spaceship> HealthChanged;
+    public event System.Action<Spaceship> Destroyed;
 
     public Team Team { get => owningTeam; }
 
@@ -230,6 +231,15 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     {
         health = newHealth;
         HealthChanged?.Invoke(this);
+
+        if(health <= 0)
+        {
+            Destroyed?.Invoke(this);
+            if (photonView.IsMine)
+            {
+                PhotonNetwork.Destroy(gameObject);
+            }
+        }
     }
 
     public void TakeDamage(Bullet bullet, float amount)

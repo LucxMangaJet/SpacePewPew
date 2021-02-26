@@ -17,6 +17,11 @@ public class GameHandler : MonoBehaviourPunCallbacks
     Dictionary<Player, bool> playersReadyStates = new Dictionary<Player, bool>();
     public event System.Action AllReady;
 
+    Dictionary<Team, int> scores = new Dictionary<Team, int>();
+    public event System.Action ScoreChanged;
+
+
+
     private void Awake()
     {
         ServiceLocator.SetGameHandler(this);
@@ -42,6 +47,15 @@ public class GameHandler : MonoBehaviourPunCallbacks
             Debug.Log("All players ready!");
             AllReady?.Invoke();
         }
+    }
+
+    public int GetScoreOf(Team t)
+    {
+        if (scores.ContainsKey(t))
+        {
+            return scores[t];
+        }
+        return 0;
     }
 
     private bool AllPlayersReady()
@@ -79,6 +93,10 @@ public class GameHandler : MonoBehaviourPunCallbacks
     private void InitializePlayer()
     {
         PhotonNetwork.Instantiate(ServiceLocator.PREFABS_PATH + playerCamPrefab.name, Vector3.zero, Quaternion.identity);
+
+        scores.Add(Team.Red, 0);
+        scores.Add(Team.Blue, 0);
+        ScoreChanged?.Invoke();
     }
 
     private void InitializeGame()
@@ -86,9 +104,22 @@ public class GameHandler : MonoBehaviourPunCallbacks
         Debug.Log("Intitialize Game");
         var spaceship1 = PhotonNetwork.Instantiate(ServiceLocator.PREFABS_PATH + spaceshipPrefab.name, new Vector3(-5, 0, 0), Quaternion.identity).GetComponent<Spaceship>();
         spaceship1.Server_SetTeam(Team.Red);
+        spaceship1.Destroyed += OnDestroyedSpaceship;
 
-        var spaceship2 = PhotonNetwork.Instantiate(ServiceLocator.PREFABS_PATH + spaceshipPrefab.name, new Vector3(5,0,0), Quaternion.identity).GetComponent<Spaceship>();
+        var spaceship2 = PhotonNetwork.Instantiate(ServiceLocator.PREFABS_PATH + spaceshipPrefab.name, new Vector3(5, 0, 0), Quaternion.identity).GetComponent<Spaceship>();
         spaceship2.Server_SetTeam(Team.Blue);
+        spaceship2.Destroyed += OnDestroyedSpaceship;
+    }
+
+    private void OnDestroyedSpaceship(Spaceship obj)
+    {
+        Debug.Log(obj.Team + " destroyed");
+        if (obj.Team == Team.Blue)
+            Server_AddScore(Team.Red);
+        else
+            Server_AddScore(Team.Blue);
+
+        ScoreChanged?.Invoke();
     }
 
     public override void OnConnectedToMaster()
@@ -108,5 +139,17 @@ public class GameHandler : MonoBehaviourPunCallbacks
             PhotonNetwork.LocalPlayer.NickName = "Local Player";
             Initialize();
         }
+    }
+
+    public void Server_AddScore(Team t)
+    {
+        photonView.RPC(nameof(RPC_AddScore), RpcTarget.AllBuffered, t);
+    }
+
+    [PunRPC]
+    private void RPC_AddScore(Team t)
+    {
+        scores[t] += 1;
+        ScoreChanged?.Invoke();
     }
 }
