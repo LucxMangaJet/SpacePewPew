@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 2190737203606466350}
   - component: {fileID: 2190737203606466351}
   - component: {fileID: 2190737203606466336}
+  - component: {fileID: 4179182353355684831}
   m_Layer: 0
   m_Name: Asteroid
   m_TagString: Untagged
@@ -126,6 +127,8 @@ MonoBehaviour:
   rigidbody: {fileID: 2190737203606466351}
   lightTransform: {fileID: 4840667338950257821}
   lightOffset: {x: 2, y: 2, z: 0}
+  hp: 40
+  maxHp: 40
 --- !u!114 &2190737203606466349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146,6 +149,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   ObservedComponents:
   - {fileID: 2190737203606466336}
+  - {fileID: 4179182353355684831}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -230,7 +234,7 @@ MonoBehaviour:
   - {x: -5.1207743, y: -0.1788933, z: 0}
   m_ShapePathHash: 1335243500
   m_Mesh: {fileID: 0}
-  m_InstanceId: 33346
+  m_InstanceId: -94784
 --- !u!58 &2190737203606466350
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -258,8 +262,8 @@ Rigidbody2D:
   m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 1
-  m_Mass: 80.75432
+  m_UseAutoMass: 0
+  m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 0
@@ -284,3 +288,19 @@ MonoBehaviour:
   m_SynchronizeAngularVelocity: 1
   m_TeleportEnabled: 1
   m_TeleportIfDistanceGreaterThan: 3
+--- !u!114 &4179182353355684831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2190737203606466340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 0
+  m_SynchronizeRotation: 0
+  m_SynchronizeScale: 1
+  m_UseLocal: 1
