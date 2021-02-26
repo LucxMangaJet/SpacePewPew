@@ -9781,7 +9781,7 @@ MonoBehaviour:
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 48
   m_PointLightOuterRadius: 64
-  m_PointLightDistance: 3
+  m_PointLightDistance: 10
   m_PointLightQuality: 1
   m_ShapeLightParametricSides: 5
   m_ShapeLightParametricAngleOffset: 0
@@ -19542,6 +19542,7 @@ MonoBehaviour:
   rotationRetargetingMultiplyer: 5
   maxSpeed: 25
   maxRotationSpeed: 300
+  collisionDamageMultipliyer: 0.5
   teamColorsRenderer: {fileID: 6926503782296021030}
   cockpitCamTarget: {fileID: 6816321587762030669}
   weapon1CamTarget: {fileID: 3495063541378357082}
