@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 using UnityEngine.InputSystem;
+using System.Linq;
 
 //Maybe write own client side prediction: https://www.kinematicsoup.com/news/2017/5/30/multiplayerprediction
 //add boost
@@ -22,6 +23,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     [SerializeField] float maxHealth;
     [SerializeField] float rotationRetargetingMultiplyer;
     [SerializeField] float maxSpeed, maxRotationSpeed;
+    [SerializeField] float collisionMultipliyer = 1;
 
     [Header("Components")]
     [SerializeField] SpriteRenderer teamColorsRenderer;
@@ -230,7 +232,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         health = newHealth;
         HealthChanged?.Invoke(this);
 
-        if(health <= 0)
+        if (health <= 0)
         {
             Destroyed?.Invoke(this);
             if (photonView.IsMine)
@@ -324,6 +326,19 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         if (AmOwningPilot())
         {
             breaksCache = context.ReadValue<float>();
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (photonView.IsMine)
+        {
+            Vector3 p = collision.contacts[0].point;
+
+            var impactMultiplyer = 0.5f + Mathf.Min(90f, Vector3.Angle(-transform.up, p - transform.position)) / 90;
+
+            var damage = collisionMultipliyer * impactMultiplyer * collision.relativeVelocity.magnitude;
+            Server_SetHealth(health - damage);
         }
     }
 }
