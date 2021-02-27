@@ -19537,7 +19537,7 @@ MonoBehaviour:
   engineForce: 1000
   breakForce: 300
   rcsPanThrusterForce: 300
-  sasHorizontalAssistMultiplyer: 100
+  hvcMultiplyer: 100
   maxHealth: 100
   rotationRetargetingMultiplyer: 5
   maxSpeed: 25
@@ -19879,6 +19879,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: f0d21159-1872-44a1-977e-63f9ac18e0e7
     m_ActionName: Player/New action
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6926503782011930027}
+        m_TargetAssemblyTypeName: Spaceship, Assembly-CSharp
+        m_MethodName: OnToggleHVC
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 401835a9-67db-4860-9072-4e5b870ee5ce
+    m_ActionName: Pilot/New action
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player

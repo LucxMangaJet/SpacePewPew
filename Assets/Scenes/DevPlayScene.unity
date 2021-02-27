@@ -9286,11 +9286,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2190737203606466351, guid: 237caa9205d6ec44c98c840fe392093e, type: 3}
       propertyPath: m_Mass
-      value: 1
+      value: 80.75432
       objectReference: {fileID: 0}
     - target: {fileID: 2190737203606466351, guid: 237caa9205d6ec44c98c840fe392093e, type: 3}
       propertyPath: m_UseAutoMass
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 237caa9205d6ec44c98c840fe392093e, type: 3}

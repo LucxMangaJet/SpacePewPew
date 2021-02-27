@@ -19,7 +19,7 @@ public interface IDamagable
 
 public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 {
-    [SerializeField] float engineForce, breakForce, rcsPanThrusterForce, sasHorizontalAssistMultiplyer;
+    [SerializeField] float engineForce, breakForce, rcsPanThrusterForce, hvcMultiplyer;
     [SerializeField] float maxHealth;
     [SerializeField] float rotationRetargetingMultiplyer;
     [SerializeField] float maxSpeed, maxRotationSpeed;
@@ -47,7 +47,10 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
     private float accelerationCache;
     private float breaksCache;
     private float rotationForce;
-    private float sasStrength;
+    private float hvcStrength;
+
+    //Horizontal Velocity Canceler
+    private bool hvcEnabled = true;
 
     private Vector2 movementTarget;
     private Vector3 directionalLightOffset;
@@ -55,6 +58,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
 
     public event System.Action<Spaceship> HealthChanged;
     public event System.Action<Spaceship> Destroyed;
+    public event System.Action<Spaceship, bool> HVCChanged;
 
     public Team Team { get => owningTeam; }
 
@@ -128,12 +132,12 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         emission = rcsPanRight.emission;
         emission.rateOverTimeMultiplier = Mathf.Max(0, -panCache * rcsPanThrusterForce);
 
-        //SAS Horizontal assist
+        //HVC Horizontal assist
         emission = sasLeft.emission;
-        emission.rateOverTimeMultiplier = Mathf.Max(0, -sasStrength);
+        emission.rateOverTimeMultiplier = Mathf.Max(0, -hvcStrength);
 
         emission = sasRight.emission;
-        emission.rateOverTimeMultiplier = Mathf.Max(0, sasStrength);
+        emission.rateOverTimeMultiplier = Mathf.Max(0, hvcStrength);
 
     }
 
@@ -174,9 +178,16 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         }
         else
         {
-            //autocorrection SAS
-            sasStrength = -Vector2.Dot(transform.right, rigidbody.velocity) * sasHorizontalAssistMultiplyer;
-            rigidbody.AddForce(transform.right * sasStrength * Time.fixedDeltaTime);
+            //HVC
+            if (hvcEnabled)
+            {
+                hvcStrength = -Vector2.Dot(transform.right, rigidbody.velocity) * hvcMultiplyer;
+                rigidbody.AddForce(transform.right * hvcStrength * Time.fixedDeltaTime);
+            }
+            else
+            {
+                hvcStrength = 0;
+            }
         }
 
         rigidbody.velocity = Vector3.ClampMagnitude(rigidbody.velocity, maxSpeed);
@@ -263,7 +274,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
             stream.SendNext(accelerationCache);
             stream.SendNext(breaksCache);
             stream.SendNext(rotationForce);
-            stream.SendNext(sasStrength);
+            stream.SendNext(hvcStrength);
         }
         else
         {
@@ -273,7 +284,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
             accelerationCache = (float)stream.ReceiveNext();
             breaksCache = (float)stream.ReceiveNext();
             rotationForce = (float)stream.ReceiveNext();
-            sasStrength = (float)stream.ReceiveNext();
+            hvcStrength = (float)stream.ReceiveNext();
         }
     }
 
@@ -329,6 +340,18 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         if (AmOwningPilot())
         {
             breaksCache = context.ReadValue<float>();
+        }
+    }
+
+    public void OnToggleHVC(InputAction.CallbackContext context)
+    {
+        if (AmOwningPilot())
+        {
+            if (context.started)
+            {
+                hvcEnabled = !hvcEnabled;
+                HVCChanged?.Invoke(this, hvcEnabled);
+            }
         }
     }
 

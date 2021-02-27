@@ -11,7 +11,9 @@ public class BattleUI : MonoBehaviour
 {
     [SerializeField] TeamUI[] teamUIs;
     [SerializeField] RectTransform minimapRedShip, minimapBlueShip;
-    [SerializeField] TMP_Text redScore, blueScore;
+    [SerializeField] TMP_Text redScore, blueScore, hvcText;
+
+    [SerializeField] RectTransform forwardParent, velocityParent, velocityIndicator;
 
     GameHandler gameHandler;
 
@@ -23,9 +25,19 @@ public class BattleUI : MonoBehaviour
         gameHandler.OnSpaceshipSpawned += OnSpaceshipSpawned;
     }
 
-    private void OnSpaceshipSpawned(Spaceship obj)
+    private void OnSpaceshipSpawned(Spaceship ship)
     {
-        obj.HealthChanged += OnHealthChanged;
+        ship.HealthChanged += OnHealthChanged;
+
+        if (ship.photonView.IsMine)
+        {
+            ship.HVCChanged += OnHVCChanged;
+        }
+    }
+
+    private void OnHVCChanged(Spaceship ship, bool newHVCState)
+    {
+        hvcText.color = newHVCState ? Color.yellow : Color.grey;
     }
 
     private void OnDestroy()
@@ -55,6 +67,20 @@ public class BattleUI : MonoBehaviour
         if (localTeam == Team.None)
             return;
 
+        UpdateMinimap(localTeam);
+        UpdateIndicators(localTeam);
+    }
+
+    private void UpdateIndicators(Team localTeam)
+    {
+        var localShip = ServiceLocator.GetSpaceship(localTeam);
+        forwardParent.rotation = Quaternion.LookRotation(Vector3.forward, -localShip.transform.up);
+        velocityParent.rotation = Quaternion.LookRotation(Vector3.forward, localShip.Rigidbody.velocity);
+        velocityIndicator.sizeDelta = new Vector2(velocityIndicator.sizeDelta.x, localShip.Rigidbody.velocity.magnitude * 2);
+    }
+
+    private void UpdateMinimap(Team localTeam)
+    {
         if (localTeam == Team.Red)
         {
             minimapRedShip.anchoredPosition = Vector2.zero;
@@ -99,6 +125,8 @@ public class BattleUI : MonoBehaviour
             var gunner = ServiceLocator.GetFirstPlayerMatching(teamUI.Team, PlayerRole.Gunner);
             teamUI.GunnerText.text = teamUI.Team + " Gunner: " + (gunner != null ? gunner.NickName : "Empty");
         }
+
+
     }
 
     [System.Serializable]
