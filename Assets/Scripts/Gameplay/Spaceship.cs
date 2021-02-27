@@ -76,7 +76,7 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         HealthChanged?.Invoke(this);
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (AmOwningPilot())
         {
@@ -148,32 +148,35 @@ public class Spaceship : MonobehaviourPunPew, IDamagable, IPunObservable
         Vector2 newTarget = new Vector2(horizontalCache, verticalCache);
         if (newTarget.magnitude >= 1)
             newTarget.Normalize();
+
+
         if (newTarget.magnitude >= 0.1f)
-            movementTarget = Vector3.Slerp(movementTarget, newTarget, newTarget.magnitude * Time.deltaTime * rotationRetargetingMultiplyer);
+            movementTarget = Vector3.Slerp(movementTarget, newTarget, newTarget.magnitude * Time.fixedDeltaTime * rotationRetargetingMultiplyer);
         Vector2 current = -transform.up;
 
         var angleLeft = Vector2.SignedAngle(current, movementTarget);
         var rotSpeed = rigidbody.angularVelocity;
-        rotationForce = GetRotationForceToSolve(angleLeft, rotSpeed, 0.5f);
-        rigidbody.AddTorque(rotationForce * Time.deltaTime);
+        rotationForce = GetRotationForceToSolve(angleLeft, rotSpeed, 0.25f);
+        rigidbody.AddTorque(rotationForce * Time.fixedDeltaTime);
         rigidbody.angularVelocity = Mathf.Clamp(rigidbody.angularVelocity, -maxRotationSpeed, maxRotationSpeed);
 
+
         //engines
-        rigidbody.AddForce(-transform.up * accelerationCache * engineForce * Time.deltaTime);
+        rigidbody.AddForce(-transform.up * accelerationCache * engineForce * Time.fixedDeltaTime);
 
         //breakes
-        rigidbody.AddForce(transform.up * breaksCache * breakForce * Time.deltaTime);
+        rigidbody.AddForce(transform.up * breaksCache * breakForce * Time.fixedDeltaTime);
 
         if (Mathf.Abs(panCache) > 0.1f)
         {
             //panning RCS
-            rigidbody.AddForce(transform.right * -panCache * rcsPanThrusterForce * Time.deltaTime);
+            rigidbody.AddForce(transform.right * -panCache * rcsPanThrusterForce * Time.fixedDeltaTime);
         }
         else
         {
             //autocorrection SAS
             sasStrength = -Vector2.Dot(transform.right, rigidbody.velocity) * sasHorizontalAssistMultiplyer;
-            rigidbody.AddForce(transform.right * sasStrength * Time.deltaTime);
+            rigidbody.AddForce(transform.right * sasStrength * Time.fixedDeltaTime);
         }
 
         rigidbody.velocity = Vector3.ClampMagnitude(rigidbody.velocity, maxSpeed);
